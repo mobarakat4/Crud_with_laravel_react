@@ -14,12 +14,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::select(['id','title','description','image']);
+        $products = Product::select(['id','title','description','image'])->get();
 
-        return response()->json([
-
-            'products ' => $products
-        ],200);
+        return $products;
     }
 
 
@@ -32,7 +29,7 @@ class ProductController extends Controller
         $request->validate([
             'title'=>'required|string',
             'description' => 'required|string',
-            'image' => 'required"image'
+            'image' => 'required|image'
         ]);
         $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
         Storage::disk('public')->putFileAs('img/products/', $request->image , $imageName);
@@ -67,7 +64,7 @@ class ProductController extends Controller
         $product->fill($request->post())->update();
         if( $request->hasFile('image')){
             $exist = Storage::disk('public')->exists('img/products/'.$product->image);
-            if(!$exist){
+            if($exist){
                Storage::disk('public')->delete('img/products/'.$product->image);
 
             }
@@ -90,7 +87,7 @@ class ProductController extends Controller
     {
         if( $product->image){
             $exist = Storage::disk('public')->exists('img/products/'.$product->image);
-            if(!$exist){
+            if($exist){
                Storage::disk('public')->delete('img/products/'.$product->image);
             }
 
